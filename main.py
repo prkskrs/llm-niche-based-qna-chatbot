@@ -97,7 +97,6 @@ obj = {
       "What are some good study spots? ":"There are several study spots on campus, including libraries, coffee shops, and outdoor seating areas. It's important to find a location that suits your study preferences and helps you focus. ",
       "Are there quiet places to study on campus? ":"There are several study spots on campus, including libraries, coffee shops, and outdoor seating areas. It's important to find a location that suits your study preferences and helps you focus. ",
       "why should be take admission in your college?":"The infrastructure at SIT is exceptional, spanning over 50+ acres with numerous facilities such as multiple laboratories for BE students, sports grounds, gyms, and hostels. The college offers extensive training programs including personality development, soft skills, aptitude tests, and technical workshops. The curriculum is rigorous with strict attendance requirements and continuous evaluations through quizzes, internals, assignments, and exams. The faculty in the Computer Science department is highly qualified, and the college provides ample opportunities for research and internships. Placement opportunities are abundant, with companies visiting as early as the 7th semester and offering attractive salary packages. Overall, SIT is renowned for its infrastructure, training programs, curriculum, faculty, research opportunities, and placements, making it one of the top colleges in Karnataka. "
-     
     }
 
 
