@@ -8,6 +8,18 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 from transformers import pipeline
 import asyncio
+import pymongo
+
+# MongoDB connection details
+MONGODB_URL = "mongodb+srv://prkskrs:1JRRLP0TScJtklaB@cluster0.fncdhdb.mongodb.net/myPrjmtDB?retryWrites=true&w=majority"
+DB_NAME = "siddagangaDB"
+USER_COLLECTION = "users"
+
+# Connect to MongoDB
+client = pymongo.MongoClient(MONGODB_URL)
+db = client[DB_NAME]
+user_collection = db[USER_COLLECTION]
+
 
 # Download NLTK data for sentence tokenization
 nltk.download('punkt')
@@ -61,6 +73,17 @@ def get_similar_question_and_answer(question):
     
     return similar_questions, similar_answers
 
+
+# User model for signup
+class UserSignup(BaseModel):
+    email: str
+    password: str
+
+# User model for login
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
 # Define request body model
 class Question(BaseModel):
     question: str
@@ -78,6 +101,29 @@ async def get_answer(question: Question):
     summarized_text = summary[0]['summary_text']
     
     return {"similar_questions": similar_questions, "merged_and_rephrased_answer": merged_and_rephrased_answer, "answer": summarized_text}
+
+@app.post("/signup/")
+async def signup(user: UserSignup):
+    # Check if user already exists
+    print(user)
+    if user_collection.find_one({"email": user.email}):
+        return {"message": "User already exists"}
+
+    # Store user in the database
+    user_collection.insert_one({"email": user.email, "password": user.password})
+    return {"message": "User created successfully"}
+
+# Login endpoint
+@app.post("/login/")
+async def login(user: UserLogin):
+    # Retrieve user from the database
+    stored_user = user_collection.find_one({"email": user.email})
+
+    # Check if user exists and verify password
+    if user.password == stored_user["password"]:
+        return {"message": "Login successful"}
+    else:
+        return {"message": "Invalid username or password"}
 
 # Run FastAPI app
 if __name__ == "__main__":
