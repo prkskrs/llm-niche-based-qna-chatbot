@@ -94,7 +94,7 @@ async def get_answer(question: Question):
 async def signup(user: UserSignup):
     print(user)
     if user_collection.find_one({"email": user.email}):
-        return {"message": "User already exists"}
+        raise HTTPException(status_code=400, detail="User already exists with this email")
 
     user_collection.insert_one({"email": user.email, "password": user.password})
     return {"message": "User created successfully"}
@@ -105,7 +105,7 @@ async def login(user: UserLogin):
     if user.password == stored_user["password"]:
         return {"message": "Login successful"}
     else:
-        return {"message": "Invalid username or password"}
+        raise HTTPException(status_code=404, detail="Invalid Username or Password")
 
 @app.post("/store_feedback/")
 async def store_feedback(feedback: Feedback):
