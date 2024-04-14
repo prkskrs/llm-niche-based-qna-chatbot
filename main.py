@@ -88,7 +88,6 @@ async def get_answer(question: Question):
     summary_task = loop.run_in_executor(None, summarizer, merged_and_rephrased_answer, 130, 30, False)
     summary = await summary_task
     summarized_text = summary[0]['summary_text']
-    
     return {"similar_questions": similar_questions, "merged_and_rephrased_answer": merged_and_rephrased_answer, "answer": summarized_text}
 
 @app.post("/signup/")
@@ -124,19 +123,17 @@ async def store_feedback(feedback: Feedback):
 @app.get("/get_feedback/")
 async def get_feedback(company: str = Query(..., description="The name of the company to retrieve feedback for")):
     feedback_cursor = db.feedback.find({"company": company})
-    feedback_by_email = {}
+    feedback_list = []
     for feedback in feedback_cursor:
-        email_parts = feedback["email"].split("@")
-        email_key = email_parts[0]  # Extract the part before the "@" symbol
-        if email_key in feedback_by_email:
-            feedback_by_email[email_key].append({**feedback, "_id": str(feedback["_id"])})
-        else:
-            feedback_by_email[email_key] = [{**feedback, "_id": str(feedback["_id"])}]
+        feedback_list.append({
+            "username": feedback["email"].split("@")[0],
+            "answer": feedback["answer"]
+        })
 
-    if not feedback_by_email:
+    if not feedback_list:
         return JSONResponse(content={"message": "No feedback available for this company"}, status_code=404)
 
-    return feedback_by_email
+    return feedback_list
 
 
 
