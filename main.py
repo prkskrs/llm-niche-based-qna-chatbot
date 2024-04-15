@@ -56,7 +56,7 @@ def merge_and_rephrase(similar_answers):
 
 def get_similar_question_and_answer(question):
     similarities = [(q, encode_and_compute_similarity(question, q)) for q in data.keys()]
-    max_similarities = sorted(similarities, key=lambda x: x[1], reverse=True)[:2]  # Get top 5 similar questions
+    max_similarities = sorted(similarities, key=lambda x: x[1], reverse=True)[:1]
     similar_questions = [sim[0] for sim in max_similarities]
     similar_answers = [data[q] for q in similar_questions]
     
@@ -79,6 +79,7 @@ class Feedback(BaseModel):
     answer: str
     company: str
     email: str
+    difficulty: str
 
 @app.post("/get_answer/")
 async def get_answer(question: Question):
@@ -109,7 +110,7 @@ async def login(user: UserLogin):
 
 @app.post("/store_feedback/")
 async def store_feedback(feedback: Feedback):
-    existing_feedback = db.feedback.find_one({"email": feedback.email, "company": feedback.company})
+    existing_feedback = db.feedback.find_one({"email": feedback.email, "company": feedback.company, "difficulty": feedback.difficulty})
     if existing_feedback:
         raise HTTPException(status_code=400, detail="Feedback already exists for this email and company")
     existing_user = user_collection.find_one({"email": feedback.email})
@@ -121,13 +122,15 @@ async def store_feedback(feedback: Feedback):
     return {"message": "Feedback stored successfully"}
 
 @app.get("/get_feedback/")
-async def get_feedback(company: str = Query(..., description="The name of the company to retrieve feedback for")):
-    feedback_cursor = db.feedback.find({"company": company})
+async def get_feedback():
+    feedback_cursor = db.feedback.find({})
     feedback_list = []
     for feedback in feedback_cursor:
         feedback_list.append({
             "username": feedback["email"].split("@")[0],
-            "answer": feedback["answer"]
+            "answer": feedback["answer"],
+            "company": feedback["company"],
+            "difficulty": feedback["difficulty"]
         })
 
     if not feedback_list:
